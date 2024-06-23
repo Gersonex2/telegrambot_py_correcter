@@ -23,7 +23,7 @@ class Message(Base):
     user = relationship('User', back_populates='messages')
 
 # Инициализация базы данных
-engine = create_engine('sqlite:///bot_database.db')
+engine = create_engine('sqlite:///bot_database.db:5030')
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
