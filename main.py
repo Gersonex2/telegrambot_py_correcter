@@ -5,12 +5,14 @@ from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.types import ParseMode
 from aiogram.utils import executor
 
+from models import User, Message, session
+
 API_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
 OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'
 
 openai.api_key = OPENAI_API_KEY
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=INFO)
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -36,7 +38,18 @@ async def send_welcome(message: types.Message):
 
 @dp.message_handler()
 async def handle_text(message: types.Message):
+    user = session.query(User).filter_by(user_id=message.from_user.id).first()
+    if not user:
+        user = User(user_id=message.from_user.id, username=message.from_user.username)
+        session.add(user)
+        session.commit()
+
     corrected_text = await correct_text(message.text)
+
+    new_message = Message(user_id=user.user_id, text=message.text, corrected_text=corrected_text)
+    session.add(new_message)
+    session.commit()
+
     await message.reply(corrected_text, parse_mode=ParseMode.MARKDOWN)
 
 if __name__ == '__main__':
