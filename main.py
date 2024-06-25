@@ -23,7 +23,7 @@ async def correct_text(text: str) -> str:
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that corrects text."},
+                {"role": "system", "content": "You are a helpful assistant that corrects text"},
                 {"role": "user", "content": text}
             ]
         )
